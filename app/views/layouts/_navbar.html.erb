@@ -1,0 +1,8 @@
+<div style="padding:10px; background:#f5f5f5;">
+  <%= link_to "Dashboard", root_path %> |
+  <%= link_to "My Teams", teams_path %> |
+  <%= link_to "New Team", new_team_path %> |
+  <%= button_to "Logout", destroy_user_session_path, method: :delete, form: { style: "display:inline" } %>
+
+</div>
+<hr>

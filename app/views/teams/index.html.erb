@@ -1,0 +1,12 @@
+<h1>Your Teams</h1>
+
+<%= link_to "Create Team", new_team_path %>
+
+<ul>
+  <% @teams.each do |team| %>
+    <li>
+      <%= link_to team.name, team_path(team) %>
+      (Health: <%= team.health_score %>%)
+    </li>
+  <% end %>
+</ul>

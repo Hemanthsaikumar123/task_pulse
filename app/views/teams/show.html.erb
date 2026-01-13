@@ -1,0 +1,37 @@
+<h2>Team Members</h2>
+<ul>
+  <% @members.each do |membership| %>
+    <li>
+      <strong><%= membership.user.name %></strong>
+      (<%= membership.user.email %>) —
+      <%= membership.role %>
+    </li>
+  <% end %>
+</ul>
+
+
+
+<%= link_to "New Project", new_team_project_path(@team) %>
+<h3>Add Member</h3>
+<%= form_with url: add_member_team_path(@team), method: :post do %>
+  <%= text_field_tag :email, nil, placeholder: "User email" %>
+  <%= submit_tag "Add to Team" %>
+<% end %>
+
+
+<h1><%= @team.name %></h1>
+
+<p>Health: <%= @team.health_score %>%</p>
+
+<h2>Projects</h2>
+<%= link_to "New Project", new_team_project_path(@team) %>
+
+<ul>
+  <% @projects.each do |project| %>
+    <li>
+      <%= link_to project.name, team_project_path(@team, project) %>
+      (Health: <%= project.health_score %>%)
+    </li>
+  <% end %>
+</ul>
+

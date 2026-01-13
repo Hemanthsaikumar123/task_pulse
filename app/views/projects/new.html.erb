@@ -1,0 +1,10 @@
+<h1>New Project for <%= @team.name %></h1>
+
+<%= form_with model: [@team, @project] do |f| %>
+  <div>
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+
+  <%= f.submit "Create Project" %>
+<% end %>

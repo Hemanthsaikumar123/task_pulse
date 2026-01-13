@@ -1,0 +1,24 @@
+<h1>TaskPulse Dashboard</h1>
+
+<h2>🚨 Alerts</h2>
+<% if @alerts.any? %>
+  <ul>
+    <% @alerts.each do |alert| %>
+      <li style="color:red;"><%= alert %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p style="color:green;">All good! No risks detected.</p>
+<% end %>
+
+<hr>
+
+<h2>Your Teams</h2>
+<% @teams.each do |team| %>
+  <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+    <h3><%= team.name %></h3>
+    <p>Health: <%= team.health_score %>%</p>
+    <p>Overdue tasks: <%= team.overdue_tasks.count %></p>
+    <%= link_to "Open Team", team_path(team) %>
+  </div>
+<% end %>

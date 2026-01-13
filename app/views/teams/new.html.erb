@@ -1,0 +1,10 @@
+<h1>Create Team</h1>
+
+<%= form_with model: @team do |f| %>
+  <div>
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+
+  <%= f.submit "Create" %>
+<% end %>
