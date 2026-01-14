@@ -15,9 +15,10 @@ Rails.application.routes.draw do
   root "dashboard#index"
   resources :teams do
     post :add_member, on: :member
+    delete 'remove_member/:user_id', to: 'teams#remove_member', on: :member, as: :remove_member
     resources :projects do
       resources :tasks do
-        resources :comments, only: [:create]
+        resources :comments, only: [:create, :destroy]
       end
     end
   end

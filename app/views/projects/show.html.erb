@@ -1,37 +1,134 @@
-<h1><%= @project.name %></h1>
+<div class="container">
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">📁 <%= @project.name %></h1>
+        <span class="health-score <%= @project.health_score >= 70 ? 'health-score-high' : (@project.health_score >= 40 ? 'health-score-medium' : 'health-score-low') %>">
+          <%= @project.health_score %>% Health
+        </span>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <%= link_to "➕ Add Task", new_team_project_task_path(@project.team, @project), class: "btn btn-primary" %>
+      </div>
+    </div>
 
-<%= link_to "➕ Add Task", new_team_project_task_path(@project.team, @project) %>
+    <% if @tasks.any? %>
+      <div class="grid grid-cols-1">
+        <% @tasks.each do |task| %>
+          <div class="task-card <%= 'task-overdue' if task.overdue? %>">
+            <!-- Task Header with Title and Actions -->
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; gap: 1.5rem;">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                  <h3 class="task-title" style="margin-bottom: 0;"><%= task.title %></h3>
+                  <% if task.overdue? %>
+                    <span class="badge badge-danger">⚠️ Overdue</span>
+                  <% end %>
+                </div>
+                
+                <% if task.description.present? %>
+                  <p style="color: var(--text-secondary); font-size: 0.938rem; margin-bottom: 0; line-height: 1.6;">
+                    <%= task.description %>
+                  </p>
+                <% end %>
+              </div>
 
-<p>Health: <%= @project.health_score %>%</p>
+              <!-- Action Buttons - Right Side -->
+              <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                <%= link_to "✏️ Edit", edit_team_project_task_path(@project.team, @project, task), class: "btn btn-secondary btn-sm" %>
+                <%= button_to "🗑️ Delete", team_project_task_path(@project.team, @project, task), method: :delete, class: "btn btn-danger btn-sm", data: { confirm: "Delete this task? This cannot be undone." } %>
+              </div>
+            </div>
 
+            <!-- Task Metadata -->
+            <div class="task-meta" style="margin-bottom: 1rem;">
+              <span class="status-badge status-<%= task.status.tr('_', '-') %>">
+                <% if task.status == 'done' %>
+                  ✓
+                <% elsif task.status == 'in_progress' %>
+                  ⟳
+                <% else %>
+                  ○
+                <% end %>
+                <%= task.status.humanize %>
+              </span>
+              
+              <span class="priority-indicator priority-<%= task.priority %>">
+                <%= task.priority.capitalize %>
+              </span>
+              
+              <% if task.due_date %>
+                <span class="task-due-date <%= 'due-soon' if task.due_date <= Date.today + 2.days && !task.completed? %>">
+                  📅 Due <%= task.due_date.strftime("%b %d, %Y") %>
+                </span>
+              <% end %>
 
-<h2>Tasks</h2>
+              <% if task.assignee %>
+                <span class="task-assignee">
+                  👤 <%= task.assignee.name %>
+                </span>
+              <% end %>
+            </div>
 
-<% @tasks.each do |task| %>
-  <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px;">
-    <strong><%= task.title %></strong>
-    <p>Status: <%= task.status %></p>
-    <p>Priority: <%= task.priority %></p>
-    <p>Due: <%= task.due_date %></p>
+            <!-- Status Update Section -->
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); margin-bottom: 1rem;">
+              <%= form_with model: [@project.team, @project, task], method: :patch, style: "display: flex; align-items: center; gap: 0.75rem;" do |f| %>
+                <label style="font-weight: 500; color: var(--text-primary); margin: 0;">Update Status:</label>
+                <%= f.select :status, [['📝 To Do', 'todo'], ['🔄 In Progress', 'in_progress'], ['✅ Done', 'done']], {}, { class: "form-control", style: "flex: 1; max-width: 200px;" } %>
+                <%= f.submit "Update", class: "btn btn-primary btn-sm" %>
+              <% end %>
+            </div>
 
-    <%= form_with model: [@project.team, @project, task], method: :patch do |f| %>
-      <%= f.select :status, %w[todo in_progress done] %>
-      <%= f.submit "Update Status" %>
-    <% end %>
+            <div class="comments-section">
+              <h4 style="font-size: 1rem; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                💬 Comments
+                <span class="badge badge-info" style="font-size: 0.75rem;"><%= task.comments.count %></span>
+              </h4>
+              
+              <% if task.comments.any? %>
+                <div class="comments-list" style="margin-bottom: 1rem;">
+                  <% task.comments.each do |comment| %>
+                    <div class="comment">
+                      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.375rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                          <div class="comment-author"><%= comment.user.name %></div>
+                          <span style="font-size: 0.75rem; color: var(--text-light);">
+                            <%= time_ago_in_words(comment.created_at) %> ago
+                          </span>
+                        </div>
+                        <% if comment.user == current_user || @project.team.owner == current_user %>
+                          <%= button_to "Delete", team_project_task_comment_path(@project.team, @project, task, comment), method: :delete, class: "btn btn-danger btn-sm", style: "padding: 0.25rem 0.5rem; font-size: 0.75rem;", data: { confirm: "Delete this comment?" } %>
+                        <% end %>
+                      </div>
+                      <p class="comment-content"><%= comment.content %></p>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <p style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 1rem; font-style: italic;">
+                  No comments yet. Start the conversation!
+                </p>
+              <% end %>
 
-    <hr>
-
-    <h4>Comments</h4>
-    <% task.comments.each do |comment| %>
-      <p><strong><%= comment.user.name %>:</strong> <%= comment.content %></p>
-    <% end %>
-
-    <%= form_with model: [@project.team, @project, task, Comment.new] do |f| %>
-      <%= f.text_field :content, placeholder: "Add a comment..." %>
-      <%= f.submit "Post" %>
+              <%= form_with model: [@project.team, @project, task, Comment.new], class: "comment-form" do |f| %>
+                <%= f.text_field :content, placeholder: "Add a comment...", class: "form-control", style: "flex: 1;" %>
+                <%= f.submit "Post", class: "btn btn-primary" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <div class="empty-state-icon">✅</div>
+        <h3 class="empty-state-title">No tasks yet</h3>
+        <p class="empty-state-text">Create your first task to get started!</p>
+        <%= link_to "Add Task", new_team_project_task_path(@project.team, @project), class: "btn btn-primary" %>
+      </div>
     <% end %>
   </div>
-<% end %>
+</div>
+
 
 
 

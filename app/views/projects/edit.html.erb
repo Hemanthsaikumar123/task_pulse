@@ -1,7 +1,7 @@
 <div class="container">
   <div class="main-content">
     <div class="page-header">
-      <h1 class="page-title">📁 New Project for <%= @team.name %></h1>
+      <h1 class="page-title">✏️ Edit Project</h1>
       <%= link_to "← Back to Team", team_path(@team), class: "btn btn-secondary" %>
     </div>
 
@@ -13,7 +13,10 @@
             <%= f.text_field :name, class: "form-control", placeholder: "Enter project name" %>
           </div>
 
-          <%= f.submit "Create Project", class: "btn btn-primary" %>
+          <div style="display: flex; gap: 0.75rem;">
+            <%= f.submit "Update Project", class: "btn btn-primary" %>
+            <%= link_to "Cancel", team_path(@team), class: "btn btn-secondary" %>
+          </div>
         <% end %>
       </div>
     </div>

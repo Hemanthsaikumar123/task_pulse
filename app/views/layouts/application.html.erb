@@ -25,6 +25,24 @@
 
   <body>
     <%= render "layouts/navbar" if user_signed_in? %>
+    
+    <% if notice || alert %>
+      <div class="container" style="padding-top: 1rem;">
+        <% if notice %>
+          <div class="alert alert-success" data-dismissible>
+            <button class="alert-close" onclick="this.parentElement.remove()" aria-label="Close">&times;</button>
+            <%= notice %>
+          </div>
+        <% end %>
+        <% if alert %>
+          <div class="alert alert-danger" data-dismissible>
+            <button class="alert-close" onclick="this.parentElement.remove()" aria-label="Close">&times;</button>
+            <%= alert %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    
     <%= yield %>
   </body>
 </html>

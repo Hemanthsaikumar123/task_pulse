@@ -1,24 +1,97 @@
-<h1>TaskPulse Dashboard</h1>
+<div class="container">
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">📊 Dashboard</h1>
+    </div>
 
-<h2>🚨 Alerts</h2>
-<% if @alerts.any? %>
-  <ul>
-    <% @alerts.each do |alert| %>
-      <li style="color:red;"><%= alert %></li>
+    <% if @alerts.any? %>
+      <div class="alert alert-danger">
+        <h3 style="margin-top: 0;">🚨 Alerts</h3>
+        <ul style="margin-bottom: 0; padding-left: 1.5rem;">
+          <% @alerts.each do |alert| %>
+            <li><%= alert %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <div class="alert alert-success">
+        <strong>✅ All good!</strong> No risks detected.
+      </div>
     <% end %>
-  </ul>
-<% else %>
-  <p style="color:green;">All good! No risks detected.</p>
-<% end %>
 
-<hr>
+    <h2 style="margin-top: 2rem; margin-bottom: 1.5rem;">Your Teams</h2>
+    
+    <% if @teams.any? %>
+      <div class="grid grid-cols-3">
+        <% @teams.each do |team| %>
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title"><%= team.name %></h3>
+              
+              <div class="flex items-center gap-2 mb-3">
+                <span class="health-score <%= team.health_score >= 70 ? 'health-score-high' : (team.health_score >= 40 ? 'health-score-medium' : 'health-score-low') %>">
+                  <%= team.health_score %>% Health
+                </span>
+              </div>
+              
+              <p class="mb-2" style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: var(--danger-color);">⚠️</span>
+                <strong><%= team.overdue_tasks.count %></strong> overdue tasks
+              </p>
+              
+              <%= link_to "View Team →", team_path(team), class: "btn btn-primary btn-sm" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
 
-<h2>Your Teams</h2>
-<% @teams.each do |team| %>
-  <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-    <h3><%= team.name %></h3>
-    <p>Health: <%= team.health_score %>%</p>
-    <p>Overdue tasks: <%= team.overdue_tasks.count %></p>
-    <%= link_to "Open Team", team_path(team) %>
+      <!-- Activity Feed -->
+      <h2 style="margin-top: 3rem; margin-bottom: 1.5rem;">📋 Recent Activity</h2>
+      
+      <% if @activities.any? %>
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="activity-feed">
+              <% @activities.each do |activity| %>
+                <div class="activity-item">
+                  <div class="activity-icon"><%= activity.icon %></div>
+                  <div class="activity-content">
+                    <div class="activity-text">
+                      <strong><%= activity.user.name %></strong>
+                      <%= activity.description %>
+                      <% if activity.trackable.present? %>
+                        <strong>
+                          <% if activity.trackable_type == 'Project' %>
+                            <%= activity.trackable.name %>
+                          <% elsif activity.trackable_type == 'Task' %>
+                            <%= activity.trackable.title %>
+                          <% end %>
+                        </strong>
+                      <% end %>
+                    </div>
+                    <div class="activity-time">
+                      <%= time_ago_in_words(activity.created_at) %> ago
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="empty-state" style="padding: 2rem;">
+          <div class="empty-state-icon" style="font-size: 2rem;">📋</div>
+          <p class="empty-state-text">No recent activity</p>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <h3 class="empty-state-title">No teams yet</h3>
+        <p class="empty-state-text">Create your first team to get started!</p>
+        <%= link_to "Create Team", new_team_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
   </div>
-<% end %>
+</div>
+

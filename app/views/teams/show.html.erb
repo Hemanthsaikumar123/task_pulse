@@ -1,37 +1,83 @@
-<h2>Team Members</h2>
-<ul>
-  <% @members.each do |membership| %>
-    <li>
-      <strong><%= membership.user.name %></strong>
-      (<%= membership.user.email %>) —
-      <%= membership.role %>
-    </li>
-  <% end %>
-</ul>
+<div class="container">
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title"><%= @team.name %></h1>
+        <span class="health-score <%= @team.health_score >= 70 ? 'health-score-high' : (@team.health_score >= 40 ? 'health-score-medium' : 'health-score-low') %>">
+          <%= @team.health_score %>% Health
+        </span>
+      </div>
+      <%= link_to "➕ New Project", new_team_project_path(@team), class: "btn btn-primary" %>
+    </div>
 
+    <div class="grid grid-cols-2">
+      <!-- Projects Section -->
+      <div>
+        <h2>📁 Projects</h2>
+        <% if @projects.any? %>
+          <div class="list-group">
+            <% @projects.each do |project| %>
+              <div class="list-item">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <h4 style="margin-bottom: 0.5rem;">
+                      <%= link_to project.name, team_project_path(@team, project) %>
+                    </h4>
+                    <span class="health-score <%= project.health_score >= 70 ? 'health-score-high' : (project.health_score >= 40 ? 'health-score-medium' : 'health-score-low') %>" style="font-size: 0.813rem; padding: 0.25rem 0.75rem;">
+                      <%= project.health_score %>% Health
+                    </span>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <%= link_to "View →", team_project_path(@team, project), class: "btn btn-secondary btn-sm" %>
+                    <%= link_to "Edit", edit_team_project_path(@team, project), class: "btn btn-secondary btn-sm" %>
+                    <%= button_to "Delete", team_project_path(@team, project), method: :delete, class: "btn btn-danger btn-sm", data: { confirm: "Delete #{project.name}?" } %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="empty-state" style="padding: 2rem;">
+            <div class="empty-state-icon" style="font-size: 2rem;">📁</div>
+            <p class="empty-state-text" style="margin-bottom: 1rem;">No projects yet</p>
+            <%= link_to "Create Project", new_team_project_path(@team), class: "btn btn-secondary btn-sm" %>
+          </div>
+        <% end %>
+      </div>
 
+      <!-- Team Members Section -->
+      <div>
+        <h2>👥 Team Members</h2>
+        <ul class="member-list">
+          <% @members.each do |membership| %>
+            <li class="member-item">
+              <div class="member-info">
+                <span class="member-name"><%= membership.user.name %></span>
+                <span class="member-email"><%= membership.user.email %></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="member-role"><%= membership.role %></span>
+                <% if membership.user != @team.owner && current_user == @team.owner %>
+                  <%= button_to "Remove", remove_member_team_path(@team, user_id: membership.user.id), method: :delete, class: "btn btn-danger btn-sm", data: { confirm: "Remove #{membership.user.name} from team?" } %>
+                <% end %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
 
-<%= link_to "New Project", new_team_project_path(@team) %>
-<h3>Add Member</h3>
-<%= form_with url: add_member_team_path(@team), method: :post do %>
-  <%= text_field_tag :email, nil, placeholder: "User email" %>
-  <%= submit_tag "Add to Team" %>
-<% end %>
-
-
-<h1><%= @team.name %></h1>
-
-<p>Health: <%= @team.health_score %>%</p>
-
-<h2>Projects</h2>
-<%= link_to "New Project", new_team_project_path(@team) %>
-
-<ul>
-  <% @projects.each do |project| %>
-    <li>
-      <%= link_to project.name, team_project_path(@team, project) %>
-      (Health: <%= project.health_score %>%)
-    </li>
-  <% end %>
-</ul>
+        <div class="card" style="margin-top: 1.5rem;">
+          <div class="card-header">
+            <h3 style="margin: 0; font-size: 1rem;">➕ Add Member</h3>
+          </div>
+          <div class="card-body">
+            <%= form_with url: add_member_team_path(@team), method: :post, style: "display: flex; gap: 0.75rem;" do %>
+              <%= text_field_tag :email, nil, placeholder: "User email", class: "form-control", style: "flex: 1;" %>
+              <%= submit_tag "Add to Team", class: "btn btn-primary" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 

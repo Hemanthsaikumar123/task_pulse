@@ -13,6 +13,19 @@ class TeamsController < ApplicationController
     end
   end
 
+  def remove_member
+    @team = current_user.owned_teams.find(params[:id])
+    user = User.find(params[:user_id])
+    membership = @team.team_memberships.find_by(user: user)
+
+    if membership && user != @team.owner
+      membership.destroy
+      redirect_to team_path(@team), notice: "#{user.name} removed from team"
+    else
+      redirect_to team_path(@team), alert: "Cannot remove team owner or member not found"
+    end
+  end
+
 
   def index
     @teams = current_user.teams

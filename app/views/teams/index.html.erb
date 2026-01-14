@@ -1,12 +1,35 @@
-<h1>Your Teams</h1>
+<div class="container">
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">👥 Your Teams</h1>
+      <%= link_to "➕ Create Team", new_team_path, class: "btn btn-primary" %>
+    </div>
 
-<%= link_to "Create Team", new_team_path %>
-
-<ul>
-  <% @teams.each do |team| %>
-    <li>
-      <%= link_to team.name, team_path(team) %>
-      (Health: <%= team.health_score %>%)
-    </li>
-  <% end %>
-</ul>
+    <% if @teams.any? %>
+      <div class="grid grid-cols-2">
+        <% @teams.each do |team| %>
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title"><%= team.name %></h3>
+              
+              <div class="flex items-center gap-2 mb-3">
+                <span class="health-score <%= team.health_score >= 70 ? 'health-score-high' : (team.health_score >= 40 ? 'health-score-medium' : 'health-score-low') %>">
+                  <%= team.health_score %>% Health
+                </span>
+              </div>
+              
+              <%= link_to "View Team →", team_path(team), class: "btn btn-secondary btn-sm" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <h3 class="empty-state-title">No teams yet</h3>
+        <p class="empty-state-text">Create your first team to start collaborating!</p>
+        <%= link_to "Create Your First Team", new_team_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

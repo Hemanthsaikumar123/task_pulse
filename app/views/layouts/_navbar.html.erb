@@ -1,8 +1,13 @@
-<div style="padding:10px; background:#f5f5f5;">
-  <%= link_to "Dashboard", root_path %> |
-  <%= link_to "My Teams", teams_path %> |
-  <%= link_to "New Team", new_team_path %> |
-  <%= button_to "Logout", destroy_user_session_path, method: :delete, form: { style: "display:inline" } %>
+<nav class="navbar">
+  <div class="navbar-container">
+    <%= link_to "📋 TaskPulse", root_path, class: "navbar-brand" %>
+    
+    <ul class="navbar-links">
+      <li><%= link_to "Dashboard", root_path %></li>
+      <li><%= link_to "My Teams", teams_path %></li>
+      <li><%= link_to "➕ New Team", new_team_path, class: "btn btn-primary btn-sm" %></li>
+      <li><%= button_to "Logout", destroy_user_session_path, method: :delete, class: "btn btn-secondary btn-sm" %></li>
+    </ul>
+  </div>
+</nav>
 
-</div>
-<hr>

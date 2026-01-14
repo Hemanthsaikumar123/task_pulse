@@ -1,7 +1,7 @@
 <div class="container">
   <div class="main-content">
     <div class="page-header">
-      <h1 class="page-title">➕ New Task</h1>
+      <h1 class="page-title">✏️ Edit Task</h1>
       <%= link_to "← Back to Project", team_project_path(@project.team, @project), class: "btn btn-secondary" %>
     </div>
 
@@ -43,7 +43,7 @@
           </div>
 
           <div style="display: flex; gap: 0.75rem;">
-            <%= f.submit "Create Task", class: "btn btn-primary" %>
+            <%= f.submit "Update Task", class: "btn btn-primary" %>
             <%= link_to "Cancel", team_project_path(@project.team, @project), class: "btn btn-secondary" %>
           </div>
         <% end %>

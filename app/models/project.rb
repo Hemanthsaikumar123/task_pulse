@@ -28,9 +28,17 @@ class Project < ApplicationRecord
 
     overdue = overdue_tasks.count
     completed = tasks.where(status: "done").count
+    in_progress = tasks.where(status: "in_progress").count
 
-    score = ((completed.to_f - overdue) / total) * 100
-    score.round
+    # Similar calculation as team health score
+    completion_score = (completed.to_f / total) * 100
+    overdue_penalty = (overdue.to_f / total) * 50
+    progress_bonus = (in_progress.to_f / total) * 50  # 50% credit for work in progress
+
+    score = completion_score + progress_bonus - overdue_penalty
+    
+    # Ensure score is between 0 and 100
+    [[score.round, 0].max, 100].min
   end
 
 end
